@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Anton&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Inter", "Space Grotesk", sans-serif;
+  
+  --color-primary: #064e3b;
+  --color-accent: #059669;
+  --color-success: #10b981;
+  --color-background: #f0fdf4;
+  --color-surface: #ffffff;
+  --color-text: #1e293b;
+  --color-border: #d1fae5;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight text-primary;
+  }
+}
+
+.tile {
+  @apply bg-surface rounded-none p-8 shadow-none border-l-4 border-primary transition-all duration-300 hover:bg-emerald-50/50;
+}
+
+.tile-title {
+  @apply text-[12px] uppercase text-accent mb-6 font-black tracking-[0.3em] flex items-center gap-3;
+}
+
+.tile-title::before {
+  content: "";
+  @apply w-8 h-[2px] bg-accent inline-block;
+}
+
+.tile-content {
+  @apply text-[16px] leading-snug text-slate-700;
+}
+
+.sidebar-item {
+  @apply text-sm text-slate-500 mb-1 flex items-center gap-2;
+}
+
+.download-btn {
+  @apply bg-primary text-white px-6 py-2.5 rounded-full font-semibold text-sm transition-all hover:bg-slate-800 hover:shadow-lg active:scale-95;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300;
+}
