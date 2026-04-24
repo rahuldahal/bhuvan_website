@@ -1,8 +1,17 @@
-export type Language = "np" | "en";
+import fs from 'fs';
+const file = 'src/translations.ts';
+let content = fs.readFileSync(file, 'utf8');
 
-export const translations = {
-  np: {
-    appTitle: "भुवन दाहाल \"विवश\"",
+const npStart = content.indexOf('  np: {');
+const realEnMatch = content.match(/  en: \{\n    appTitle: "Bhuvan Dahal \\"Biwash\\"/);
+const realEnIdx = realEnMatch ? realEnMatch.index : -1;
+
+console.log('npStart:', npStart);
+console.log('realEnIdx:', realEnIdx);
+
+if (npStart !== -1 && realEnIdx !== -1) {
+    const cleanNp = `  np: {
+    appTitle: "भुवन दाहाल \\"विवश\\"",
     appSubtitle: "डिजिटल पोर्टफोलियो",
     progress: "प्रगति",
     sections: "खण्डहरू",
@@ -13,7 +22,7 @@ export const translations = {
     role: "प्रशासकीय अधिकृत",
     personalDetails: "व्यक्तिगत विवरण",
     birthDate: "जन्म मिति",
-    birthDateVal: "बि.सं. २०२६ साल मंसिर २७ गते \n(सन् १९६९-१२-१२)",
+    birthDateVal: "बि.सं. २०२६ साल मंसिर २७ गते \\n(सन् १९६९-१२-१२)",
     address: "स्थायी ठेगाना",
     addressVal: "गौरादह-१, झापा",
     email: "इमेल",
@@ -22,7 +31,7 @@ export const translations = {
     socialMedia: "सामाजिक सञ्जाल",
     interests: "रुचिहरू",
     interestsList: ["साहित्य", "संगीत", "AI", "प्रशासन", "चित्रकला"],
-    copyright: "© २०२६ भुवन दाहाल \"विवश\"",
+    copyright: "© २०२६ भुवन दाहाल \\"विवश\\"",
     rights: "सबै अधिकार सुरक्षित | दमक, झापा",
     contactEmail: "सम्पर्क इमेल",
     downloadCV: "CV डाउनलोड गर्नुहोस्",
@@ -55,7 +64,7 @@ export const translations = {
     aiExifSoftware: "सफ्टवेयर",
     aiExifNoData: "अतिरिक्त जानकारी उपलब्ध छैन",
     aiAdminImpact: "प्रशासनमा ठोस प्रभाव",
-    aiQuote: "\"AI ले सरकारी फाइलहरूको छिटो व्यवस्थापन, सुशासनमा सुधार र नागरिक संवादलाई अझै प्रभावकारी बनाउनेछ।\"",
+    aiQuote: "\\"AI ले सरकारी फाइलहरूको छिटो व्यवस्थापन, सुशासनमा सुधार र नागरिक संवादलाई अझै प्रभावकारी बनाउनेछ।\\"",
     mp3Error: "कृपया केवल MP3 फाइल मात्र छान्नुहोस्।",
     playing: "बजिरहेको छ",
     playNow: "प्ले गर्नुहोस्",
@@ -70,28 +79,28 @@ export const translations = {
     closePreview: "प्रिभ्यु बन्द गर्नुहोस्",
     contactIntro: "उहाँसँग थप संवाद वा सहकार्यका लागि तलका माध्यमहरूबाट सम्पर्क गर्न सकिन्छ:",
     slides: {
-      "01": {
+      \\"01\\": {
         title: "परिचय",
         intro: "अनुभवी प्रशासकीय अधिकृत तथा बहुमुखी स्रष्टा।",
         desc: "भुवन दाहाल दमक नगरपालिकामा एक अनुभवी प्रशासकीय अधिकृत हुनुहुन्छ, जसले सुशासन र नागरिक सेवामा दशकौँ लामो योगदान दिनुभएको छ। उहाँले त्रिभुबन बिश्वबिद्यालय अन्तर्गत मेची बहुमुखी क्याम्पसबाट ब्यबस्थापन बिषयमा स्नातक सम्मको अध्यायन पुरा गर्नु भएको छ। साथै उहाँको रेडियो जगतमा समेत कार्य गरेको अनुभव छ।"
       },
-      "02": {
+      \\"02\\": {
         title: "जन्म र ठेगाना",
         content: "वि.सं. २०२६ साल मंसिर २७ गते (सन् १९६९-१२-१२) मा खोटाङ जिल्ला साविक बाक्सिला वडा नम्बर ४ हाल केपिलासगढी गाउँपालिकामा जन्मिएका उहाँको हालको स्थायी घर झापाको सुन्दर नगर गौरादह नगरपालिका वडा नम्बर-१ मा रहेको छ।"
       },
-      "03": {
+      \\"03\\": {
         title: "कार्य क्षेत्र",
         content: "दमक नगरपालिकाको प्रशासनिक व्यवस्थापनमा उहाँको महत्वपूर्ण र नेतृत्वदायी भूमिका रहेको छ।",
         location: "दमक नगरपालिका, झापा"
       },
-      "04": {
+      \\"04\\": {
         title: "प्रशासनिक भूमिका",
         desc: "दमक नगरपालिकाको सेवामा भुवन दाहालको प्रशंसनीय यात्रा र प्रमुख उपलब्धिहरू:",
         timeline: [
           {
             period: "सुरुवाती चरण",
             title: "सेवाको सुरुवात",
-            desc: "नगरपालिकाको प्रशासनिक संरचनामा प्रवेश और आधारभूत सेवा प्रवाहमा संलग्नता।"
+            desc: "नगरपालिकाको प्रशासनिक संरचनामा प्रवेश र आधारभूत सेवा प्रवाहमा संलग्नता।"
           },
           {
             period: "मध्यम अवधि",
@@ -110,9 +119,9 @@ export const translations = {
           }
         ],
         impactTitle: "मुख्य प्रभाव",
-        impactQuote: "\"प्रशासन केवल फाइलको व्यवस्थापन मात्र होइन, यो समाज परिवर्तन र नागरिकको जीवनस्तर उकास्ने एक सशक्त माध्यम हो।\""
+        impactQuote: "\\"प्रशासन केवल फाइलको व्यवस्थापन मात्र होइन, यो समाज परिवर्तन र नागरिकको जीवनस्तर उकास्ने एक सशक्त माध्यम हो।\\""
       },
-      "05": {
+      \\"05\\": {
         title: "साहित्यिक रुचि",
         poems: [
           { title: "जब उठे वीरहरू (कविता)", intro: "देशको स्वाभिमानका लागि लड्ने वीरहरूको साहसको वर्णन गरिएको क्रान्तिकारी कविता।" },
@@ -134,15 +143,15 @@ export const translations = {
         ],
         note: "नोट: कविताहरू मूल नेपाली भाषामै रहेका छन् ताकि उनीहरूको कलात्मक भाव यथावत रहोस्।"
       },
-      "06": {
+      \\"06\\": {
         title: "संगीत एवं कला",
         intro: "संगीत उहाँको जीवनको एक अविभाज्य पाटो हो। उहाँ विशेषगरी कालजयी स्रष्टा गोपाल योञ्जन र स्वर सम्राट नारायण गोपालका सिर्जनाहरूबाट गहिरो रूपमा प्रभावित हुनुहुन्छ।",
         songs: [
-          { title: "देशभक्ति गीत (रचना)", lyrics: "आउ है देश प्रेमी साथीहरू हो यो देशलाई सिगार्न...\nपन्छाउ त्यस्ता व्यक्तिलाई (जो गर्छ आँट देश बिगार्न)..." },
-          { title: "कलाकारको संझना", lyrics: "तिमी थियौ यक्ष देशमा स्वाभिमानी कलाकार...\nरङ्गाइदियौ यो वातावरणलाई तिमीले नै सिँगार...\nसजाएर राख्न चाहन्थ्यौ हामी तिमीलाई..." }
+          { title: "देशभक्ति गीत (रचना)", lyrics: "आउ है देश प्रेमी साथीहरू हो यो देशलाई सिगार्न...\\nपन्छाउ त्यस्ता व्यक्तिलाई (जो गर्छ आँट देश बिगार्न)..." },
+          { title: "कलाकारको संझना", lyrics: "तिमी थियौ यक्ष देशमा स्वाभिमानी कलाकार...\\nरङ्गाइदियौ यो वातावरणलाई तिमीले नै सिँगार...\\nसजाएर राख्न चाहन्थ्यौ हामी तिमीलाई..." }
         ]
       },
-      "07": {
+      \\"07\\": {
         title: "ए.आइ. (AI) मा रुचि",
         intro: "भुवन दाहाल प्रविधिलाई समाज रूपान्तरणको मुख्य कडी मान्नुहुन्छ। उहाँ **आर्टिफिसियल इन्टेलिजेन्स (AI)** का निम्न क्षेत्रहरूमा विशेष अभिरुचि राख्नुहुन्छ:",
         topics: [
@@ -151,7 +160,7 @@ export const translations = {
           { title: "एआई नैतिकता (AI Ethics)", desc: "प्रविधिलाई न्यायोचित र पारदर्शी बनाउँदै नागरिकको गोपनीयताको उच्च सम्मान हुनुपर्ने उहाँको धारणा छ।" }
         ]
       },
-      "08": {
+      \\"08\\": {
         title: "आधुनिक प्रशासन",
         content: "प्रशासनमा प्रविधिको उचित संयोजनले सेवा प्रवाहलाई प्रभावकारी बनाउन सकिन्छ भन्ने उहाँको गहिरो विश्वास छ। आधुनिक प्रशासनका मुख्य विशेषताहरू यस प्रकार छन्:",
         features: [
@@ -162,15 +171,15 @@ export const translations = {
           "नागरिक केन्द्रित शासन व्यवस्था"
         ]
       },
-      "09": {
+      \\"09\\": {
         title: "सामाजिक सक्रियता",
         content: "झापा जिल्लाको सामाजिक र सांस्कृतिक जागरणका विभिन्न कार्यक्रमहरूमा उहाँको सहभागिता उल्लेखनीय रहन्छ।"
       },
-      "10": {
+      \\"10\\": {
         title: "लक्ष्य एवं दर्शन",
         content: "सिर्जनशीलता र इमानदारीलाई उहाँ आफ्नो जीवनको मुख्य आधार मान्नुहुन्छ।"
       },
-      "11": {
+      \\"11\\": {
         title: "दक्षता एवं सीप",
         desc: "भुवन दाहालका प्रमुख व्यावसायिक र व्यक्तिगत दक्षताहरू:",
         skillGroups: [
@@ -192,7 +201,7 @@ export const translations = {
           }
         ]
       },
-      "12": {
+      \\"12\\": {
         title: "सहकर्मीका अनुभव",
         desc: "भुवन दाहालसँग कार्य गरिरहेका सहकर्मी र सेवाग्राहीहरूको विचारहरू:",
         items: [
@@ -208,7 +217,7 @@ export const translations = {
           }
         ]
       },
-      "13": {
+      \\"13\\": {
         title: "पुरस्कार एवं सम्मान",
         desc: "प्रशासनिक र साहित्यिक यात्रामा प्राप्त केही प्रमुख सम्मानहरू:",
         items: [
@@ -217,7 +226,7 @@ export const translations = {
           "सामुदायिक विकासमा पुर्याएको योगदानका लागि कदर।"
         ]
       },
-      "14": {
+      \\"14\\": {
         title: "भावी प्राथमिकताहरू",
         desc: "आउने समयका लागि भुवन दाहालका मुख्य सोचहरू:",
         goals: [
@@ -226,11 +235,11 @@ export const translations = {
           "स्थानीय प्रशासनमा एआई (AI) को व्यावहारिक प्रयोग सुरु गर्ने।"
         ]
       },
-      "15": {
+      \\"15\\": {
         title: "सम्पर्क तथा सञ्जाल",
         desc: "उहाँसँग थप संवाद वा सहकार्यका लागि तलका माध्यमहरूबाट सम्पर्क गर्न सकिन्छ:"
       },
-      "16": {
+      \\"16\\": {
         title: "एआई भिडियो प्रदर्शन",
         intro: "एआई प्रविधिको शक्ति प्रदर्शन गर्न गुगलको **Veo** टुलमार्फत तयार पारिएको भिडियो नमुनाहरू:",
         promptPlaceholder: "के भिडियो बनाउन चाहनुहुन्छ? जस्तै: 'नेपाली गाउँमा एआई रोबोट धान काट्दै'...",
@@ -243,251 +252,10 @@ export const translations = {
       }
     }
   },
-  en: {
-    appTitle: "Bhuvan Dahal \"Biwash\"",
-    appSubtitle: "Digital Portfolio",
-    progress: "Progress",
-    sections: "Sections",
-    updatePhoto: "Update Photo",
-    changePhoto: "Change",
-    removePhotoConfirm: "Are you sure you want to remove this photo?",
-    removePhotoTitle: "Remove Photo",
-    role: "Administrative Officer",
-    personalDetails: "Personal Details",
-    birthDate: "Date of Birth",
-    birthDateVal: "Dec 12, 1969 \n(2026 Mangsir 27 BS)",
-    address: "Permanent Address",
-    addressVal: "Gauradaha-1, Jhapa",
-    email: "Email",
-    workplace: "Workplace",
-    workplaceVal: "Damak Municipality, Jhapa",
-    socialMedia: "Social Media",
-    interests: "Interests",
-    interestsList: ["Literature", "Music", "AI", "Administration", "Painting"],
-    copyright: "© 2026 Bhuvan Dahal \"Biwash\"",
-    rights: "All Rights Reserved | Damak, Jhapa",
-    contactEmail: "Contact Email",
-    downloadCV: "Download CV",
-    cvNotAvailable: "CV file is currently unavailable. Please try again later or contact the admin.",
-    ok: "OK & Continue",
-    section: "Section",
-    aiPhotoChoose: "Choose Photo",
-    aiPhotoUploading: "Uploading...",
-    aiPhotoSuccess: "Uploaded Successfully!",
-    aiPhotoPrompt: "Upload your favorite AI related photo here",
-    aiPhotoLimit: "You can only upload up to 25 photos.",
-    aiPhotoUploadConfirm: "Do you want to upload the selected photos?",
-    aiPhotoDelete: "Remove Photo",
-    aiPhotoSaveDraft: "Save as Draft",
-    aiPhotoDraftSuccess: "Draft saved successfully!",
-    aiPhotoPendingTitle: "Pending Drafts",
-    aiPhotoCaptionPlaceholder: "Enter caption...",
-    aiPhotoEditCaption: "Add Caption",
-    aiPhotoEditDescription: "Add Description",
-    aiPhotoDescriptionPlaceholder: "Add more descriptive text about this photo...",
-    aiPhotoSizeError: "Photo is too large. Please select a photo smaller than 2MB.",
-    aiPhotoStorageError: "Storage full. Please remove some old photos.",
-    aiGalleryView: "View Gallery",
-    aiGalleryClose: "Close Gallery",
-    aiGalleryEmpty: "No photos yet.",
-    aiPhotoInfo: "Photo Info",
-    aiExifCamera: "Camera",
-    aiExifModel: "Model",
-    aiExifDate: "Date",
-    aiExifSoftware: "Software",
-    aiExifNoData: "No additional metadata available",
-    aiAdminImpact: "Impact on Administration",
-    aiQuote: "\"AI will lead to faster management of government files, improved governance, and more effective citizen dialogue.\"",
-    mp3Error: "Please select an MP3 file only.",
-    playing: "Playing",
-    playNow: "Play Now",
-    audioNote: "Note: The audios above are samples.",
-    contactQrNote: "Scan to connect directly",
-    contactMail: "Email",
-    contactFb: "Facebook",
-    contactWeb: "Website",
-    contactCall: "Contact",
-    print: "PDF / Print",
-    printPreview: "Print Preview",
-    closePreview: "Close Preview",
-    contactIntro: "You can connect with him through the following channels for further dialogue or collaboration:",
-    slides: {
-      "01": {
-        title: "Introduction",
-        intro: "Experienced Administrative Officer and Versatile Creator.",
-        desc: "Bhuvan Dahal is an experienced Administrative Officer at Damak Municipality, who has contributed for decades to good governance and citizen service. He completed his graduation in Management from Mechi Multiple Campus under Tribhuvan University. Additionally, he has experience working in the field of radio broadcasting."
-      },
-      "02": {
-        title: "Birth & Address",
-        content: "Born on 27th Mangsir 2026 (1969-12-12), his permanent home is in the beautiful city of Gauradaha-1, Jhapa."
-      },
-      "03": {
-        title: "Work Area",
-        content: "He plays a significant and leading role in the administrative management of Damak Municipality.",
-        location: "Damak Municipality, Jhapa"
-      },
-      "04": {
-        title: "Administrative Role",
-        desc: "Bhuvan Dahal's commendable journey and key achievements in the service of Damak Municipality:",
-        timeline: [
-          {
-            period: "Initial Phase",
-            title: "Start of Service",
-            desc: "Entry into the municipality's administrative structure and involvement in basic service delivery."
-          },
-          {
-            period: "Middle Period",
-            title: "Departmental Coordination",
-            desc: "Leadership in effective coordination between various departments and increasing administrative efficiency."
-          },
-          {
-            period: "Modernization",
-            title: "Digitization Campaign",
-            desc: "Leading role in making public services technology-friendly and digitizing records."
-          },
-          {
-            period: "Current",
-            title: "Planning & Governance Expert",
-            desc: "Active role in budget formulation, development plan implementation, and ensuring good governance."
-          }
-        ],
-        impactTitle: "Main Impact",
-        impactQuote: "\"Administration is not just the management of files; it is a powerful medium to change society and improve the standard of living of citizens.\""
-      },
-      "05": {
-        title: "Literary Interests",
-        poems: [
-          { title: "In the Eyes of a Woman (Poem)", intro: "A deep exploratory poem about the perspective and strength of women." },
-          { title: "Enemy's Gaze (Poem)", intro: "A poem reflecting on life's struggles and the impact of negative forces." },
-          { title: "For the Youth (Poem)", intro: "An inspiring call to the youth to contribute to their homeland." },
-          { title: "I will disappear (Poem)", intro: "A philosophical piece about life, legacy, and transcendence." },
-          { title: "Bird's Love (Poem)", intro: "A gentle poem about the simple and pure love in nature." },
-          { title: "When Heroes Rose (Poem)", intro: "A powerful revolutionary poem honoring the courage of those who fought for freedom." },
-          { title: "Today's Small Buds (Poem)", intro: "A hopeful poem dedicated to children, the future of the nation." },
-          { title: "Drummer Brother (Song)", intro: "A rhythmic poem/song addressing a drummer and reflecting on societal struggles." },
-          { title: "Land of Heroes (Poem)", intro: "A patriotic tribute to the resilience and pride of Nepal." },
-          { title: "Tears in Eyes (Poem)", intro: "A poignant piece about overcoming pain and continuing the struggle." },
-          { title: "Line of Migrants (Song)", intro: "A heart-wrenching poem about the pain of migration due to economic hardship." },
-          { title: "Daughter's Heart Cries (Song)", intro: "A song-poem expressing the sorrow and longing of a woman for her natal home." },
-          { title: "My Country Lives On (Poem)", intro: "An optimistic poem about the eternal spirit and survival of the nation." },
-          { title: "My Cap (Poem)", intro: "A symbolic poem celebrating the 'Dhaka Topi' as a mark of identity." },
-          { title: "High like the Himalaya (Poem)", intro: "A welcoming poem about courage, resilience, and unity." },
-          { title: "Rise from Villages (Song)", intro: "A famous revolutionary song calling for mass awakening and social change." },
-          { title: "Love for the Country (Poem)", intro: "A soulful poem about patriotism and the sacrifice of soldiers abroad." },
-          { title: "My Cap on My Head (Song)", intro: "A cultural song linking identity and the struggles of the common man." },
-          { title: "Crossing the Sea Tides (Poem)", intro: "A poem about bravery, war, and returning home with honor." },
-          { title: "Rise, O Worker and Farmer (Poem)", intro: "An empowering call to the working class to stand up for their rights." },
-          { title: "I am a Bud (Poem)", intro: "A beautiful metaphor of a child or a new dream waiting to bloom." }
-        ],
-        note: "Note: The poems are primarily in Nepali to preserve their artistic essence. Please switch to Nepali to read the full verses."
-      },
-      "06": {
-        title: "Music & Art",
-        intro: "Music is an inseparable part of his life. He is deeply influenced by the creations of immortal artists Gopal Yonzon and Narayan Gopal.",
-        songs: [
-          { title: "Patriotic Song (Composition)", lyrics: "Come, fellow patriots, to decorate this country...\nRemove those people (who dare to ruin the country)..." },
-          { title: "Remembrance of the Artist", lyrics: "You were a self-respecting artist in this land...\nYou decorated this environment with your art...\nWe wanted to keep you decorated..." }
-        ]
-      },
-      "07": {
-        title: "Interest in AI",
-        intro: "Bhuvan Dahal believes that technology is the key link for social transformation. He is particularly interested in the following areas of Artificial Intelligence (AI):",
-        topics: [
-          { title: "Machine Learning", desc: "Interest in its use to analyze data and predict future plans and needs." },
-          { title: "Natural Language Processing (NLP)", desc: "Exploring the potential of NLP technology to automate government services and information in local languages." },
-          { title: "AI Ethics", desc: "Believes technology should be fair and transparent while respecting citizen privacy." }
-        ]
-      },
-      "08": {
-        title: "Modern Administration",
-        content: "He deeply believes that the proper combination of technology in administration can make service delivery effective. Key features of modern administration include:",
-        features: [
-          "Transparency and Accountability",
-          "Technology-friendly Service Delivery",
-          "Corruption-free and Honest Administration",
-          "Simplification and Strengthening of Procedures",
-          "Citizen-centric Governance Awareness"
-        ]
-      },
-      "09": {
-        title: "Social Activism",
-        content: "His participation in various social and cultural awakening programs in Jhapa district is noteworthy."
-      },
-      "10": {
-        title: "Goal & Vision",
-        content: "He considers creativity and honesty as the main basis of his life."
-      },
-      "11": {
-        title: "Skills & Proficiencies",
-        desc: "Bhuvan Dahal's key professional and personal skills:",
-        skillGroups: [
-          {
-            category: "Administrative Leadership",
-            skills: ["Planning & Formulation", "Governance Management", "Public Service Delivery", "Budget Implementation"]
-          },
-          {
-            category: "Technology & Innovation",
-            skills: ["Digital Records Management", "AI Implementation Interest", "Office Automation"]
-          },
-          {
-            category: "Creative Abilities",
-            skills: ["Literary Writing", "Music Composition", "Public Speaking"]
-          },
-          {
-            category: "Managerial Skills",
-            skills: ["Team Leadership", "Problem Solving", "Decision Making"]
-          }
-        ]
-      },
-      "12": {
-        title: "Testimonials",
-        desc: "Thoughts from colleagues and clients who have worked with Bhuvan Dahal:",
-        items: [
-          {
-            name: "Hari Prasad Sharma",
-            title: "Colleague, Administrative Officer",
-            quote: "Bhuvan's work style is very transparent and effective. He is skilled at integrating technology with administration."
-          },
-          {
-            name: "Sita Paudel",
-            title: "Client",
-            quote: "His helpful behavior at the municipality makes things very easy. He is always ready to make work quick and efficient."
-          }
-        ]
-      },
-      "13": {
-        title: "Awards & Honors",
-        desc: "Key honors received during the administrative and literary journey:",
-        items: [
-          "Letters of appreciation from various literary organizations.",
-          "Recognition for outstanding performance from the Municipality.",
-          "Appreciation for contributions to community development."
-        ]
-      },
-      "14": {
-        title: "Future Priorities",
-        desc: "Main visions of Bhuvan Dahal for the future:",
-        goals: [
-          "Making Damak Municipality's services fully 'Paperless'.",
-          "Encouraging youth in literature and innovation.",
-          "Starting practical use of AI in local administration."
-        ]
-      },
-      "15": {
-        title: "Contact & Network",
-        desc: "You can connect with him through the following channels for further dialogue or collaboration:"
-      },
-      "16": {
-        title: "AI Video Demonstration",
-        intro: "Video samples prepared using Google's **Veo** tool to demonstrate the power of AI technology:",
-        promptPlaceholder: "What video do you want to create? e.g., 'An AI robot harvesting rice in a Nepali village'...",
-        generateBtn: "Generate Video",
-        generating: "Preparing video (this may take a few minutes)...",
-        selectKey: "Select API Key",
-        billingNote: "A paid API key is required to generate videos.",
-        errorKey: "Please select an API key first.",
-        videoResult: "AI Generated Video:"
-      }
-    }
-  }
-};
+`;
+    
+    content = content.substring(0, npStart) + cleanNp + content.substring(realEnIdx);
+    fs.writeFileSync(file, content);
+} else {
+    console.error('Could not find npStart or realEnIdx');
+}
