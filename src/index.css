@@ -3,7 +3,7 @@
 
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Inter", "Space Grotesk", sans-serif;
+  --font-display: "Anton", "Space Grotesk", sans-serif;
   
   --color-primary: var(--primary);
   --color-accent: var(--accent);

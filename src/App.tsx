@@ -5,11 +5,10 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "motion/react";
-import { User, Calendar, MapPin, Mail, Briefcase, FileDown, PenTool, Music, Cpu, MessageSquare, Phone, Facebook, Globe, Camera, Trash2, X, CheckCircle2, Play, Pause, Volume2, VolumeX, Upload, Loader2, Languages, Save, Info, Award, TrendingUp, Moon, Sun, Printer } from "lucide-react";
-import { translations, Language } from "./translations";
-import ExifReader from 'exifreader';
+import { User, Calendar, MapPin, Mail, Briefcase, FileDown, PenTool, Music, Cpu, MessageSquare, Phone, Facebook, Globe, Camera, Trash2, X, CheckCircle2, Play, Pause, Volume2, VolumeX, Upload, Loader2, Languages, Save, Info, Award, TrendingUp, Moon, Sun, Printer, Search } from "lucide-react";
+import { Language, translations } from "./translations";
 
-const CV_URL = "https://example.com/bhuvan-dahal-cv.pdf"; // Updated CV URL
+// CV URL state is now managed inside the App component
 
 const CustomAudioPlayer = ({ url, onUpload, id }: { url: string; onUpload?: (id: string, file: File) => void; id?: string }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -188,32 +187,10 @@ const CustomAudioPlayer = ({ url, onUpload, id }: { url: string; onUpload?: (id:
   );
 };
 
-interface AiPhoto {
-  url: string;
-  caption: string;
-  description?: string;
-  exif?: Record<string, any>;
-}
-
 const getSlides = (
   customAudio: Record<string, string>, 
   handleAudioUpload: (id: string, file: File) => void,
-  aiPhotos: AiPhoto[],
-  onAiPhotoUpload: (files: FileList) => void,
-  onAiPhotoDelete: (index: number) => void,
-  onAiUpdate: (index: number, updates: Partial<AiPhoto>) => void,
-  isAiPhotoLoading: boolean,
-  aiPhotoSuccess: boolean,
-  onPhotoClick: (index: number) => void,
-  aiUploadQueue: { id: string; name: string; progress: number }[],
-  lang: Language,
-  onGalleryOpen: () => void,
-  showAiUploadConfirm: boolean,
-  setShowAiUploadConfirm: (show: boolean) => void,
-  pendingFilesToUpload: FileList | null,
-  setPendingFilesToUpload: (files: FileList | null) => void,
-  startAiUpload: () => void,
-  setAiPhotoSuccess: (success: boolean) => void
+  lang: Language
 ) => {
   const ts = translations[lang].slides;
   const t = translations[lang];
@@ -320,7 +297,7 @@ const getSlides = (
               {poem.title}
             </p>
             <div className="text-[13px] leading-relaxed italic whitespace-pre-line border-l-2 border-primary/20 pl-4 py-1 text-text/90">
-              {poem.content || poem.intro}
+              {poem.intro}
             </div>
             <div className="mt-2 text-[10px] text-right font-bold text-gray-400">
                 — {t.appTitle} {idx === 2 && lang === "np" ? ", गौरादह १ झापा" : ""}
@@ -385,120 +362,6 @@ const getSlides = (
     icon: <Cpu className="w-5 h-5" />,
     content: (
       <div className="max-h-[400px] overflow-y-auto pr-3 custom-scrollbar flex flex-col gap-6">
-        <div className="flex flex-col gap-4 relative">
-          <div className="bg-purple-50 p-4 border border-purple-100 rounded-xl mb-4">
-            <div className="flex justify-between items-center mb-4">
-              <h4 className="text-xs font-black uppercase tracking-widest text-purple-700">{t.slides["07"].title}</h4>
-              <p className="text-[10px] text-purple-700 font-bold uppercase tracking-wider">{t.aiPhotoPrompt}</p>
-            </div>
-
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-2">
-              {aiPhotos.map((photo, index) => (
-                <motion.div 
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="relative aspect-square group/pic bg-white overflow-hidden border border-purple-200 shadow-sm cursor-zoom-in"
-                  onClick={() => onPhotoClick(index)}
-                >
-                  <img 
-                    src={photo.url} 
-                    alt={`AI Fav ${index}`} 
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover/pic:scale-110 grayscale group-hover/pic:grayscale-0" 
-                    referrerPolicy="no-referrer" 
-                  />
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAiPhotoDelete(index);
-                    }}
-                    className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-600/90 text-white flex items-center justify-center opacity-0 group-hover/pic:opacity-100 transition-all hover:bg-black z-10"
-                    title={t.aiPhotoDelete}
-                  >
-                    <X className="w-2.5 h-2.5" />
-                  </button>
-                </motion.div>
-              ))}
-              
-              {aiPhotos.length < 25 && (
-                <div 
-                  className="relative aspect-square bg-white flex flex-col items-center justify-center border-2 border-dashed border-purple-200 group/upload cursor-pointer hover:bg-purple-100 hover:border-purple-400 transition-all"
-                  onClick={() => document.getElementById('ai-photo-upload')?.click()}
-                >
-                  <Upload className="w-5 h-5 text-purple-400 group-hover/upload:scale-110 transition-transform" />
-                  <span className="text-[7px] font-black text-purple-500 uppercase mt-1.5 tracking-tighter">{t.aiPhotoChoose}</span>
-                  <span className="absolute bottom-1 right-1 text-[6px] text-purple-300">{aiPhotos.length}/25</span>
-                </div>
-              )}
-            </div>
-            
-            <AnimatePresence>
-              {aiPhotoSuccess && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mb-3 bg-emerald-50 border border-emerald-100 rounded-lg p-2 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2 text-emerald-700">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider">{t.aiPhotoSuccess}</span>
-                  </div>
-                  <button onClick={() => setAiPhotoSuccess(false)} className="text-emerald-400 hover:text-emerald-600">
-                    <X className="w-3 h-3" />
-                  </button>
-                </motion.div>
-              )}
-
-              {aiUploadQueue.length > 0 && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-3 bg-purple-900/10 rounded-lg p-3 flex flex-col gap-2 border border-purple-200/50"
-                >
-                  <h4 className="text-[9px] font-bold uppercase tracking-widest text-purple-600 flex items-center gap-2">
-                    <Loader2 className="w-3 h-3 animate-spin" /> {t.aiPhotoUploading}
-                  </h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    {aiUploadQueue.map((item) => (
-                      <div key={item.id} className="w-full space-y-1">
-                        <div className="flex justify-between items-center text-[7px] font-bold text-purple-800">
-                          <span className="truncate max-w-[80%]">{item.name}</span>
-                          <span>{item.progress}%</span>
-                        </div>
-                        <div className="w-full h-1 bg-white rounded-full overflow-hidden border border-purple-100">
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${item.progress}%` }}
-                            className="h-full bg-purple-600"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <input 
-            type="file" 
-            id="ai-photo-upload" 
-            className="hidden" 
-            accept="image/*" 
-            multiple
-            disabled={isAiPhotoLoading}
-            onChange={(e) => {
-              const files = e.target.files;
-              if (files) {
-                onAiPhotoUpload(files);
-                e.target.value = ""; // Clear the input to allow re-selection
-              }
-            }}
-          />
-        </div>
-
         <p className="text-gray-700 leading-relaxed text-sm">
           {ts["07"].intro}
         </p>
@@ -725,56 +588,73 @@ const getSlides = (
   ];
 }
 
-export default function App() {
-  const [profilePic, setProfilePic] = useState<string>(() => {
-    return localStorage.getItem("bhuvan_profile_pic") || "https://www.newbusinessage.com/img/news/20200115112108_Bhuvan_Dahal.jpg";
+/**
+ * Utility to crop image
+ */
+const getCroppedImg = async (imageSrc: string, pixelCrop: { x: number; y: number; width: number; height: number }) => {
+  const image = new Image();
+  image.crossOrigin = 'anonymous'; // Added for CORS support
+  image.src = imageSrc;
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = reject;
   });
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) return null;
+
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
+
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  );
+
+  return canvas.toDataURL('image/jpeg');
+};
+
+export default function App() {
   const [isHovered, setIsHovered] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [customAudio, setCustomAudio] = useState<Record<string, string>>({});
-  const [aiPhotos, setAiPhotos] = useState<AiPhoto[]>(() => {
-    const saved = localStorage.getItem("bhuvan_ai_photos");
-    if (!saved) return [];
-    try {
-      const parsed = JSON.parse(saved);
-      // Migration: support both string (legacy) and object (new)
-      return parsed.map((item: any) => 
-        typeof item === 'string' ? { url: item, caption: "", description: "" } : { caption: "", description: "", ...item }
-      );
-    } catch {
-      return [];
-    }
-  });
-  const [isAiPhotoLoading, setIsAiPhotoLoading] = useState(false);
-  const [aiPhotoSuccess, setAiPhotoSuccess] = useState(false);
-  const [aiUploadQueue, setAiUploadQueue] = useState<{ id: string; name: string; progress: number }[]>([]);
-  const [showAiUploadConfirm, setShowAiUploadConfirm] = useState(false);
-  const [pendingFilesToUpload, setPendingFilesToUpload] = useState<FileList | null>(null);
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
-  const [showExif, setShowExif] = useState(false);
+  const [slideSearchQuery, setSlideSearchQuery] = useState("");
   const [lang, setLang] = useState<Language>(() => (localStorage.getItem("bhuvan_lang") as Language) || "np");
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("bhuvan_dark_mode") === "true");
   const [isPrinting, setIsPrinting] = useState(false);
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
-  const [isAiGalleryOpen, setIsAiGalleryOpen] = useState(false);
+
+  const mainRef = useRef<HTMLElement>(null);
+  const [cvUrl, setCvUrl] = useState<string>(() => {
+    return localStorage.getItem("bhuvan_cv_url") || "https://example.com/bhuvan-dahal-cv.pdf";
+  });
+  const { scrollYProgress } = useScroll({ container: mainRef });
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   useEffect(() => {
     const handleBeforePrint = () => setIsPrinting(true);
     const handleAfterPrint = () => setIsPrinting(false);
     window.addEventListener('beforeprint', handleBeforePrint);
     window.addEventListener('afterprint', handleAfterPrint);
+
     return () => {
       window.removeEventListener('beforeprint', handleBeforePrint);
       window.removeEventListener('afterprint', handleAfterPrint);
     };
   }, []);
-
-  useEffect(() => {
-    if (aiPhotoSuccess) {
-      const timer = setTimeout(() => setAiPhotoSuccess(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [aiPhotoSuccess]);
 
   const handlePrint = () => {
     window.focus();
@@ -784,6 +664,52 @@ export default function App() {
       console.error("Print error:", e);
       alert(lang === "np" ? "प्रिन्ट विन्डो खोल्न सकिएन। कृपया नयाँ ट्याबमा खोलेर प्रयास गर्नुहोस् वा Ctrl+P थिच्नुहोस्।" : "Could not open print window. Please try opening in a new tab or press Ctrl+P.");
     }
+  };
+
+  const handleExportHtml = () => {
+    const rootElement = document.getElementById('root');
+    if (!rootElement) return;
+
+    // Get all styles to make it somewhat standalone
+    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+      .map(el => el.outerHTML)
+      .join('\n');
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="${lang}" class="${isDarkMode ? 'dark' : ''}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${t.appTitle} - ${t.appSubtitle}</title>
+    ${styles}
+    <style>
+      body { margin: 0; padding: 0; }
+      .no-export { display: none !important; }
+      /* Fix for some interactive elements in static view */
+      .motion-div { opacity: 1 !important; transform: none !important; }
+    </style>
+</head>
+<body class="bg-background text-foreground transition-colors duration-300">
+    <div id="root">
+      ${rootElement.innerHTML}
+    </div>
+    <script>
+      console.log("Static export of Bhuvan Dahal Portfolio");
+      // Add a simple notification
+      alert("${t.exportHtmlSuccess}");
+    </script>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Bhuvan_Dahal_Portfolio_${lang}_${new Date().toISOString().split('T')[0]}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -801,10 +727,6 @@ export default function App() {
 
   const t = translations[lang];
 
-  useEffect(() => {
-    setShowExif(false);
-  }, [selectedPhotoIndex]);
-
   const handleAudioUpload = (id: string, file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -816,222 +738,25 @@ export default function App() {
     reader.readAsDataURL(file);
   };
 
-  const handleAiPhotoUpload = (files: FileList) => {
-    const fileArray = Array.from(files);
-    
-    if (aiPhotos.length + fileArray.length > 25) {
-      alert(t.aiPhotoLimit);
-      return;
-    }
-
-    // Start upload immediately for a simpler flow
-    startAiUpload(files);
-  };
-
-  const startAiUpload = async (filesToUpload: FileList | null = null) => {
-    const files = filesToUpload || pendingFilesToUpload;
-    if (!files) return;
-    
-    setPendingFilesToUpload(null);
-    setShowAiUploadConfirm(false);
-    
-    const fileArray = Array.from(files);
-    
-    setIsAiPhotoLoading(true);
-    setAiPhotoSuccess(false);
-
-    // Initialize upload queue
-    const initialQueue = fileArray.map((f, i) => ({ 
-      id: `up-${Date.now()}-${i}`, 
-      name: f.name, 
-      progress: 0 
-    }));
-    setAiUploadQueue(initialQueue);
-
-    const processFile = (file: File, id: string): Promise<AiPhoto> => {
-      return new Promise((resolve, reject) => {
-        if (file.size > 2 * 1024 * 1024) {
-          reject(new Error("File too large"));
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onerror = () => reject(new Error("File read error"));
-        reader.onloadend = async () => {
-          let exifData: Record<string, any> | undefined;
-          try {
-            const tags = ExifReader.load(reader.result as ArrayBuffer);
-            const data: Record<string, any> = {};
-            if (tags.Make) data.make = tags.Make.description;
-            if (tags.Model) data.model = tags.Model.description;
-            if (tags.DateTimeOriginal) data.date = tags.DateTimeOriginal.description;
-            if (tags.Software) data.software = tags.Software.description;
-            if (tags.ImageWidth) data.width = tags.ImageWidth.value;
-            if (tags.ImageHeight) data.height = tags.ImageHeight.value;
-            if (Object.keys(data).length > 0) exifData = data;
-          } catch (e) {
-            console.warn("EXIF failed:", e);
-          }
-
-          const dataReader = new FileReader();
-          dataReader.onerror = () => reject(new Error("Data URL read error"));
-          dataReader.onloadend = () => {
-            const img = new Image();
-            img.onload = async () => {
-              setAiUploadQueue(prev => prev.map(item => item.id === id ? { ...item, progress: 20 } : item));
-              await new Promise(r => setTimeout(r, 100));
-              
-              const canvas = document.createElement('canvas');
-              let width = img.width;
-              let height = img.height;
-              const MAX_WIDTH = 1000; 
-              const MAX_HEIGHT = 1000;
-
-              if (width > height) {
-                if (width > MAX_WIDTH) {
-                  height *= MAX_WIDTH / width;
-                  width = MAX_WIDTH;
-                }
-              } else {
-                if (height > MAX_HEIGHT) {
-                  width *= MAX_HEIGHT / height;
-                  height = MAX_HEIGHT;
-                }
-              }
-
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-              if (ctx) {
-                setAiUploadQueue(prev => prev.map(item => item.id === id ? { ...item, progress: 45 } : item));
-                ctx.drawImage(img, 0, 0, width, height);
-                await new Promise(r => setTimeout(r, 100));
-                
-                setAiUploadQueue(prev => prev.map(item => item.id === id ? { ...item, progress: 80 } : item));
-                await new Promise(r => setTimeout(r, 100));
-                
-                setAiUploadQueue(prev => prev.map(item => item.id === id ? { ...item, progress: 100 } : item));
-                resolve({ 
-                  url: canvas.toDataURL('image/jpeg', 0.7), 
-                  caption: "",
-                  exif: exifData 
-                });
-              } else {
-                reject(new Error("Canvas context failed"));
-              }
-            };
-            img.onerror = () => {
-              reject(new Error("Image load failed"));
-            };
-            img.src = dataReader.result as string;
-          };
-          dataReader.readAsDataURL(file);
-        };
-        reader.readAsArrayBuffer(file);
-      });
-    };
-
-    try {
-      const results = await Promise.all(fileArray.map((file, i) => processFile(file, initialQueue[i].id)));
-      
-      setAiPhotos(prev => {
-        const updated = [...prev, ...results];
-        localStorage.setItem("bhuvan_ai_photos", JSON.stringify(updated));
-        return updated;
-      });
-      
-      await new Promise(r => setTimeout(r, 500));
-      
-      setAiUploadQueue([]);
-      setIsAiPhotoLoading(false);
-      setAiPhotoSuccess(true);
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      if (error.message === "File too large") {
-        alert(t.aiPhotoSizeError);
-      } else {
-        alert(t.aiPhotoStorageError);
-      }
-      setIsAiPhotoLoading(false);
-      setAiUploadQueue([]);
-    }
-  };
-
-  const handleAiPhotoDelete = (index: number) => {
-    if (confirm(t.removePhotoConfirm)) {
-      const updatedPhotos = aiPhotos.filter((_, i) => i !== index);
-      setAiPhotos(updatedPhotos);
-      localStorage.setItem("bhuvan_ai_photos", JSON.stringify(updatedPhotos));
-    }
-  };
-
-  const mainRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ container: mainRef });
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  const handleAiUpdate = (index: number, updates: Partial<AiPhoto>) => {
-    setAiPhotos(prev => {
-      const updated = prev.map((p, i) => i === index ? { ...p, ...updates } : p);
-      localStorage.setItem("bhuvan_ai_photos", JSON.stringify(updated));
-      return updated;
-    });
-  };
-
   const slides = getSlides(
     customAudio, 
     handleAudioUpload, 
-    aiPhotos, 
-    handleAiPhotoUpload, 
-    handleAiPhotoDelete, 
-    handleAiUpdate, 
-    isAiPhotoLoading, 
-    aiPhotoSuccess, 
-    setSelectedPhotoIndex, 
-    aiUploadQueue, 
-    lang, 
-    () => setIsAiGalleryOpen(true),
-    showAiUploadConfirm,
-    setShowAiUploadConfirm,
-    pendingFilesToUpload,
-    setPendingFilesToUpload,
-    startAiUpload,
-    setAiPhotoSuccess
+    lang
+  );
+
+const filteredSlides = slides.filter(slide => 
+    slide.title.toLowerCase().includes(slideSearchQuery.toLowerCase()) ||
+    slide.id.includes(slideSearchQuery)
   );
 
   useEffect(() => {
-    localStorage.setItem("bhuvan_profile_pic", profilePic);
-  }, [profilePic]);
+    localStorage.setItem("bhuvan_cv_url", cvUrl);
+  }, [cvUrl]);
 
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Check file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-      if (!allowedTypes.includes(file.type)) {
-        alert("कृपया केवल JPG वा PNG फोटोहरू मात्र अपलोड गर्नुहोस्।");
-        return;
-      }
-
-      // Check file size (2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        alert("फोटो २MB भन्दा कम हुनुपर्छ।");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePic(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removePhoto = () => {
-    if (confirm("के तपाईं यो फोटो हटाउन चाहनुहुन्छ?")) {
-      setProfilePic("https://www.newbusinessage.com/img/news/20200115112108_Bhuvan_Dahal.jpg");
+  const updateCvUrl = () => {
+    const newUrl = prompt("तपाईंको CV को लिङ्क (URL) यहाँ हाल्नुहोस्:", cvUrl);
+    if (newUrl !== null) {
+      setCvUrl(newUrl);
     }
   };
 
@@ -1056,6 +781,16 @@ export default function App() {
             title={t.printPreview}
           >
             {isPrinting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Printer className="w-5 h-5 text-blue-500" />}
+          </button>
+
+          <button 
+            type="button"
+            onClick={handleExportHtml}
+            className="no-print flex items-center gap-2 h-10 px-3 bg-white/10 hover:bg-white/20 transition-colors border border-white/20 text-white rounded-none"
+            title={t.exportHtml}
+          >
+            <FileDown className="w-4 h-4 text-emerald-400" />
+            <span className="text-[9px] font-black uppercase tracking-tighter hidden lg:block">{t.exportHtml}</span>
           </button>
 
           <button 
@@ -1109,7 +844,6 @@ export default function App() {
               
               <div 
                 className="relative w-full h-full bg-slate-800 rounded-full overflow-hidden border-4 border-white/10 shadow-2xl transition-transform duration-300 group-hover:scale-[1.02]"
-                onClick={() => fileInputRef.current?.click()}
               >
                 <img 
                   src="/profile_picture.jpg"
@@ -1134,39 +868,11 @@ export default function App() {
                   )}
                 </AnimatePresence>
               </div>
-
-              {profilePic !== "https://www.newbusinessage.com/img/news/20200115112108_Bhuvan_Dahal.jpg" && (
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removePhoto();
-                  }}
-                  className="absolute -right-1 bottom-2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors z-10"
-                  title="फोटो हटाउनुहोस्"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                accept="image/jpeg, image/png, image/jpg" 
-                onChange={handlePhotoUpload}
-              />
             </div>
             <h2 className="text-3xl font-display font-black mb-1 tracking-tighter text-red-500 uppercase drop-shadow-sm">{t.appTitle}</h2>
             <div className="inline-block px-3 py-1 bg-red-600 text-white rounded-none mb-2 shadow-inner">
               <p className="text-[10px] font-black uppercase tracking-[0.2em]">{t.role}</p>
             </div>
-            
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="block mx-auto text-[10px] font-bold text-white/40 hover:text-red-400 uppercase tracking-widest transition-colors mt-2 no-print"
-            >
-              {t.changePhoto}
-            </button>
           </motion.div>
 
           <div className="flex flex-col gap-4 relative z-10">
@@ -1223,9 +929,31 @@ export default function App() {
         </aside>
 
         {/* Main Content (Slides) */}
-        <main ref={mainRef} className="flex-1 bg-surface p-6 overflow-y-auto custom-scrollbar">
+        <main ref={mainRef} className="flex-1 bg-surface p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6">
+          <div className="relative max-w-xl no-print">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-primary/30" />
+            </div>
+            <input
+              type="text"
+              dir="ltr"
+              value={slideSearchQuery}
+              onChange={(e) => setSlideSearchQuery(e.target.value)}
+              placeholder={t.searchPlaceholder}
+              className="block w-full pl-10 pr-3 py-3 border border-border bg-white text-sm text-left placeholder-primary/20 focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600/50 transition-all shadow-sm"
+            />
+            {slideSearchQuery && (
+              <button
+                onClick={() => setSlideSearchQuery("")}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-primary/30 hover:text-red-600 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {slides.map((slide, idx) => (
+            {filteredSlides.map((slide, idx) => (
               <motion.div
                 key={slide.id}
                 initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
@@ -1289,15 +1017,29 @@ export default function App() {
             {t.rights}
           </div>
         </div>
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setIsFeedbackModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 text-primary hover:bg-white/20 transition-all border border-primary/20 font-bold text-[10px] uppercase tracking-widest shadow-sm"
+          >
+            <MessageSquare className="w-4 h-4 text-red-600" />
+            {t.feedback}
+          </button>
+          <button 
+            onClick={updateCvUrl}
+            className="p-2.5 bg-white/10 text-white hover:bg-white/20 transition-all border border-white/20"
+            title="CV लिङ्क अपडेट गर्नुहोस्"
+          >
+            <PenTool className="w-4 h-4" />
+          </button>
           <a
-            href={CV_URL}
+            href={cvUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => {
-              if (CV_URL.includes("example.com")) {
+              if (cvUrl.includes("example.com")) {
                 e.preventDefault();
-                alert(t.cvNotAvailable);
+                setIsPrintPreviewOpen(true);
               }
             }}
             className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-none font-bold text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg group"
@@ -1308,232 +1050,6 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Lightbox */}
-      <AnimatePresence>
-        {selectedPhotoIndex !== null && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4 md:p-10 no-print"
-            onClick={() => setSelectedPhotoIndex(null)}
-          >
-            <button 
-              className="absolute top-6 right-6 text-white/60 hover:text-white transition-colors"
-              onClick={() => setSelectedPhotoIndex(null)}
-            >
-              <X className="w-8 h-8" />
-            </button>
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              className="relative max-w-5xl w-full h-full flex flex-col items-center justify-center"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="relative max-h-[70vh] flex items-center justify-center group/imgcont">
-                <img 
-                  src={aiPhotos[selectedPhotoIndex].url} 
-                  className="max-w-full max-h-full shadow-2xl object-contain border border-white/10" 
-                  alt="Full View" 
-                  referrerPolicy="no-referrer"
-                />
-                
-                <button 
-                  onClick={() => setShowExif(!showExif)}
-                  className={`absolute top-4 left-4 p-2 transition-all ${showExif ? 'bg-white text-black' : 'bg-black/50 text-white hover:bg-black'} shadow-lg`}
-                  title={t.aiPhotoInfo}
-                >
-                  <Info className="w-5 h-5" />
-                </button>
-
-                <AnimatePresence>
-                  {showExif && (
-                    <motion.div 
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      className="absolute top-16 left-4 bg-black/80 backdrop-blur-xl border border-white/10 p-4 w-64 shadow-2xl z-20"
-                    >
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-4 flex items-center gap-2">
-                        <Camera className="w-3 h-3" /> {t.aiPhotoInfo}
-                      </h4>
-                      
-                      {aiPhotos[selectedPhotoIndex].exif ? (
-                        <div className="space-y-3">
-                          {aiPhotos[selectedPhotoIndex].exif.make && (
-                            <div>
-                              <p className="text-[8px] uppercase text-white/30 font-bold tracking-tighter">{t.aiExifCamera}</p>
-                              <p className="text-xs text-white/90 font-medium">{aiPhotos[selectedPhotoIndex].exif.make}</p>
-                            </div>
-                          )}
-                          {aiPhotos[selectedPhotoIndex].exif.model && (
-                            <div>
-                              <p className="text-[8px] uppercase text-white/30 font-bold tracking-tighter">{t.aiExifModel}</p>
-                              <p className="text-xs text-white/90 font-medium">{aiPhotos[selectedPhotoIndex].exif.model}</p>
-                            </div>
-                          )}
-                          {aiPhotos[selectedPhotoIndex].exif.date && (
-                            <div>
-                              <p className="text-[8px] uppercase text-white/30 font-bold tracking-tighter">{t.aiExifDate}</p>
-                              <p className="text-[11px] text-white/90 font-medium">{aiPhotos[selectedPhotoIndex].exif.date}</p>
-                            </div>
-                          )}
-                          {aiPhotos[selectedPhotoIndex].exif.software && (
-                            <div>
-                              <p className="text-[8px] uppercase text-white/30 font-bold tracking-tighter">{t.aiExifSoftware}</p>
-                              <p className="text-[10px] text-white/70 font-display italic">{aiPhotos[selectedPhotoIndex].exif.software}</p>
-                            </div>
-                          )}
-                          {aiPhotos[selectedPhotoIndex].exif.width && (
-                            <div>
-                              <p className="text-[8px] uppercase text-white/30 font-bold tracking-tighter">Resolution</p>
-                              <p className="text-[11px] text-white/90 font-mono">{aiPhotos[selectedPhotoIndex].exif.width} × {aiPhotos[selectedPhotoIndex].exif.height} px</p>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="py-4 flex flex-col items-center gap-2 text-white/30">
-                          <Info className="w-6 h-6 opacity-20" />
-                          <p className="text-[9px] uppercase font-bold tracking-widest">{t.aiExifNoData}</p>
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              <div className="mt-8 w-full max-w-2xl px-6 flex flex-col gap-6">
-                <div className="flex flex-col gap-4 text-center">
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-white/40 tracking-widest block mb-1">{t.aiPhotoEditCaption}</label>
-                    <input 
-                      type="text"
-                      value={aiPhotos[selectedPhotoIndex].caption}
-                      onChange={(e) => handleAiUpdate(selectedPhotoIndex, { caption: e.target.value }, false)}
-                      placeholder={t.aiPhotoCaptionPlaceholder}
-                      className="w-full bg-white/5 border-b border-white/20 text-white text-center py-2 text-xl focus:outline-none focus:border-white/50 placeholder:text-white/20 font-medium italic"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-black uppercase text-white/40 tracking-widest block mb-1">{t.aiPhotoEditDescription}</label>
-                    <textarea 
-                      value={aiPhotos[selectedPhotoIndex].description || ""}
-                      onChange={(e) => handleAiUpdate(selectedPhotoIndex, { description: e.target.value }, false)}
-                      placeholder={t.aiPhotoDescriptionPlaceholder}
-                      rows={3}
-                      className="w-full bg-white/5 border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-white/30 placeholder:text-white/20 font-medium leading-relaxed resize-none rounded-lg custom-scrollbar"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-between items-center text-white/40">
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em]">
-                    {selectedPhotoIndex + 1} / {aiPhotos.length}
-                  </span>
-                  <div className="flex gap-8">
-                    <button 
-                      disabled={selectedPhotoIndex === 0}
-                      onClick={() => setSelectedPhotoIndex(prev => prev !== null ? Math.max(0, prev - 1) : null)}
-                      className="text-white/40 hover:text-white disabled:opacity-0 transition-all uppercase text-[10px] font-black tracking-widest flex items-center gap-2"
-                    >
-                      <X className="w-3 h-3 rotate-90" /> PREV
-                    </button>
-                    <button 
-                      disabled={selectedPhotoIndex === aiPhotos.length - 1}
-                      onClick={() => setSelectedPhotoIndex(prev => prev !== null ? Math.min(aiPhotos.length - 1, prev + 1) : null)}
-                      className="text-white/40 hover:text-white disabled:opacity-0 transition-all uppercase text-[10px] font-black tracking-widest flex items-center gap-2"
-                    >
-                      NEXT <X className="w-3 h-3 -rotate-90" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* AI Gallery Full View */}
-      <AnimatePresence>
-        {isAiGalleryOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-slate-950/95 z-[250] overflow-hidden flex flex-col no-print"
-          >
-            <div className="p-6 border-b border-white/10 flex items-center justify-between bg-slate-900/50 backdrop-blur-md">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-purple-600 rounded-none flex items-center justify-center">
-                  <Cpu className="text-white w-6 h-6" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-display font-black text-white uppercase tracking-tighter">{t.slides["07"].title}</h2>
-                  <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">Total {aiPhotos.length} AI Creations</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsAiGalleryOpen(false)}
-                className="w-12 h-12 bg-white/5 hover:bg-red-600 text-white flex items-center justify-center transition-all border border-white/10"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
-              {aiPhotos.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center gap-4 text-white/20">
-                  <Camera className="w-20 h-20 opacity-10" />
-                  <p className="text-sm uppercase tracking-widest font-black">{t.aiGalleryEmpty}</p>
-                </div>
-              ) : (
-                <div className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-6 space-y-6">
-                  {aiPhotos.map((photo, index) => (
-                    <motion.div 
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="break-inside-avoid relative group/gal overflow-hidden border border-white/5 bg-white/5 cursor-zoom-in"
-                      onClick={() => {
-                        setSelectedPhotoIndex(index);
-                      }}
-                    >
-                      <img 
-                        src={photo.url} 
-                        alt={photo.caption} 
-                        loading="lazy"
-                        className="w-full h-auto grayscale group-hover/gal:grayscale-0 transition-all duration-700 group-hover/gal:scale-105" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover/gal:opacity-100 transition-opacity p-4 flex flex-col justify-end">
-                        <p className="text-[11px] text-white font-bold mb-1">{photo.caption || "No Caption"}</p>
-                        <p className="text-[9px] text-white/60 line-clamp-2">{photo.description}</p>
-                      </div>
-                      
-                      <div className="absolute top-2 right-2 flex gap-2 translate-y-[-10px] opacity-0 group-hover/gal:translate-y-0 group-hover/gal:opacity-100 transition-all">
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAiPhotoDelete(index);
-                          }}
-                          className="w-7 h-7 bg-red-600 text-white flex items-center justify-center hover:bg-black"
-                          title={t.aiPhotoDelete}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="p-4 bg-slate-900/80 border-t border-white/10 text-center">
-               <p className="text-[10px] text-white/30 uppercase tracking-[0.5em] font-bold">{t.copyright}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Print Preview Modal */}
       <AnimatePresence>
         {isPrintPreviewOpen && (
           <motion.div 
@@ -1571,7 +1087,7 @@ export default function App() {
                 <aside>
                   <div className="relative w-40 h-40 mx-auto mb-8">
                     <img 
-                      src={profilePic}
+                      src="/profile_picture.jpg"
                       alt="Bhuvan Dahal" 
                       className="w-full h-full object-cover rounded-full border-4 border-emerald-900/10 shadow-sm"
                     />
